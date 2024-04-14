@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <h1>APRENDIZAJE AUTOMATICO</h1>
+    <h2>Ejercicio de TensorFlow</h2>
+    <p>Formula: y = 2x + 6 </p>
+    <button id="entrenar">Entrenar Modelo</button> 
+    <input type="number" id="input_field"> 
+    <button onclick="prediccion()">Predecir</button>
+    <br>
+    <div id="output_field"></div>
+
+    <script>
+        let model; // Declaramos model en un ámbito global
+
+        let entrenar = document.getElementById('entrenar');
+        entrenar.addEventListener('click', async function() {
+            model = tf.sequential();
+            model.add(tf.layers.dense({
+                units: 1, // La capa tendrá una sola neurona
+                inputShape: [1] // Espera entradas unidimensionales con una longitud de 1 (x)
+            }));
+
+            model.compile({
+                loss: 'meanSquaredError', // Trata de minimizar el error cuadrático medio
+                optimizer: 'sgd' // Optimizador: stochastic gradient descent
+            })
+
+            const xs = tf.tensor2d([-6, -5, -4, -3, -2, -1, 0, 1, 2], [9, 1]);
+            const ys = tf.tensor2d([-6, -4, -2, 0, 2, 4, 6, 8, 10], [9, 1]);
+
+            await model.fit(xs, ys, {epochs: 300}); // Entrena por 300 vibraciones
+
+            alert('Modelo Entrenado');
+        });
+
+        async function prediccion() {
+            const valorX = parseFloat(document.getElementById('input_field').value); // Obtenemos el valor de entrada y lo convertimos a flotante
+            const outputTensor = model.predict(tf.tensor2d([valorX], [1, 1])); // Predecimos el valor de salida
+            const outputValue = outputTensor.dataSync()[0]; // Obtenemos el valor de salida
+
+            document.getElementById('output_field').innerHTML = 
+            `<h4>El resultado de predecir ${valorX} es: ${outputValue}</h4>`; // Mostramos el resultado
+        }
+    </script>
+</body>
+</html>
